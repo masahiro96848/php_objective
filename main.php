@@ -6,10 +6,22 @@
 require_once('./classes/Human.php');
 require_once('./classes/Enemy.php');
 require_once('./classes/Brave.php');
+require_once('./classes/BlackMage.php');
+require_once('./classes/WhiteMage.php');
 
 // インスタンス化
-$tiida = new Brave('ティーダ');
-$goblin = new Enemy('ゴブリン');
+$members = array();
+$members[] = new Brave('ディーダ');
+$members[] = new WhiteMage('ユウナ');
+$members[] = new BlackMage('ルールー');
+
+$enemies = array();
+$enemies[] = new Enemy('ゴブリン', 20);
+$enemies[] = new Enemy('ボム', 25);
+$enemies[] = new Enemy('モルボル', 30);
+
+// $tiida = new Brave('ティーダ');
+// $goblin = new Enemy('ゴブリン');
 
 
 // ターン数
