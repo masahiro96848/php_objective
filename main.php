@@ -50,13 +50,11 @@ while(!$isFinishFlg){
 
   // 味方の攻撃
   foreach($members as $member) {
-    $enemyIndex = rand(0, count($enemies)-1 );  // 添字は0から始まるので、　-1する
-    $enemy = $enemies[$enemyIndex];
     // 白魔導士の場合、味方のオブジェクトも渡す
     if(get_class($member) == "WhiteMage") {
-      $member->doAttackWhiteMage($enemy, $member);
+      $member->doAttackWhiteMage($enemies, $members);
     }else {
-      $member->doAttack($enemy);
+      $member->doAttack($enemies);  // 配列を渡すように変更
     }
     echo "\n";
   }
@@ -65,9 +63,7 @@ while(!$isFinishFlg){
 
   // 敵の攻撃
   foreach ($enemies as $enemy) {
-      $memberIndex = rand(0, count($members) - 1); // 添字は0から始まるので、-1する
-      $member = $members[$memberIndex];
-      $enemy->doAttack($member);
+      $enemy->doAttack($members);
       echo "\n";
   }
     echo "\n";
@@ -77,9 +73,48 @@ while(!$isFinishFlg){
   // $goblin->doAttack($tiida);
   // echo "\n";
 
+  // 仲間の全滅チェック
+  $deathCnt = 0;  // HPが0以下の仲間の数
+  foreach($members as $member) {
+    if($member->getHitPoint() > 0) {
+      $isFinishFlg = false;
+      break;
+    }
+    $deathCnt++;
+  }
+  if($deathCnt === count($members)) {
+    $isFinishFlg = true;
+    echo 'GAME OVER.....';
+    break;
+  }
+
+  // 敵の全滅チェック
+  $deathCnt = 0; // HPが0以下の敵の数
+  foreach ($enemies as $enemy) {
+    if ($enemy->getHitPoint() > 0) {
+        $isFinishFlg = false;
+        break;
+    }
+    $deathCnt++;
+  }
+  if ($deathCnt === count($enemies)) {
+    $isFinishFlg = true;
+    echo "♪♪♪ファンファーレ♪♪♪\n\n";
+    break;
+  }
+
   $turn++;
 
 }
 echo "★★★ 戦闘終了 ★★★\n\n";
-echo $tiida->getName() . "　：　" . $tiida->getHitPoint() . "/" . $tiida::MAX_HITPOINT . "\n";
-echo $goblin->getName() . "　：　" . $goblin->getHitPoint() . "/" . $goblin::MAX_HITPOINT . "\n\n";
+// echo $tiida->getName() . "　：　" . $tiida->getHitPoint() . "/" . $tiida::MAX_HITPOINT . "\n";
+// echo $goblin->getName() . "　：　" . $goblin->getHitPoint() . "/" . $goblin::MAX_HITPOINT . "\n\n";
+
+// 現在のHPの表示
+foreach ($members as $member) {
+    echo $member->getName() . "　：　" . $member->getHitPoint() . "/" . $member::MAX_HITPOINT . "\n";
+}
+echo "\n";
+foreach ($enemies as $enemy) {
+    echo $enemy->getName() . "　：　" . $enemy->getHitPoint() . "/" . $enemy::MAX_HITPOINT . "\n";
+}
