@@ -7,6 +7,7 @@ require_once('./classes/Human.php');
 require_once('./classes/Enemy.php');
 require_once('./classes/Brave.php');
 require_once('./classes/BlackMage.php');
+require_once('./classes/Message.php');
 require_once('./classes/WhiteMage.php');
 
 // インスタンス化
@@ -29,6 +30,24 @@ $turn = 1;
 
 $isFinishFlg = false;
 
+$messageObj = new Message;
+
+function isFinish($objects)
+{
+    $deathCnt = 0; // HPが0以下の仲間の数
+    foreach ($objects as $object) {
+        // １人でもHPが０を超えていたらfalseを返す
+        if ($object->getHitPoint() > 0) {
+            return false;
+        }
+        $deathCnt++;
+    }
+    // 仲間の数が死亡数(HPが０以下の数)と同じであればtrueを返す
+    if ($deathCnt === count($objects)) {
+        return true;
+    }
+}
+
 // どちらかのHPが0になるまで繰り返す
 while(!$isFinishFlg){
   echo "*** $turn ターン目 ***\n\n"; 
@@ -36,85 +55,45 @@ while(!$isFinishFlg){
   // echo $tiida->name . "\n";
   // echo $goblin->name . "\n";
 
-  // 現在のHPの表示
-  foreach($members as $member) {
-    echo $member->getName() . "　：　" . $member->getHitPoint() . "/" . $member::MAX_HITPOINT . "\n";
-  }
-  echo "\n";
-  foreach($enemies as $enemy) {
-    echo $enemy->getName() . "　：　" . $enemy->getHitPoint() . "/" . $enemy::MAX_HITPOINT . "\n";
-  }
-  echo "\n";
+  // 仲間の表示
+  $messageObj->displayStatusMessage($members);
 
-  // echo $goblin->getName() . "　：　" . $goblin->getHitPoint() . "/" . $goblin::MAX_HITPOINT . "\n";
+  // 敵の表示
+  $messageObj->displayStatusMessage($enemies);
 
-  // 味方の攻撃
-  foreach($members as $member) {
-    // 白魔導士の場合、味方のオブジェクトも渡す
-    if(get_class($member) == "WhiteMage") {
-      $member->doAttackWhiteMage($enemies, $members);
-    }else {
-      $member->doAttack($enemies);  // 配列を渡すように変更
-    }
-    echo "\n";
-  }
-  echo "\n";
-
+  // 仲間の攻撃
+  $messageObj->displayAttackMessage($members, $enemies);
 
   // 敵の攻撃
-  foreach ($enemies as $enemy) {
-      $enemy->doAttack($members);
-      echo "\n";
-  }
-    echo "\n";
+  $messageObj->displayAttackMessage($enemies, $members);
 
-  // $tiida->doAttack($goblin);
-  // echo "\n";
-  // $goblin->doAttack($tiida);
-  // echo "\n";
-
-  // 仲間の全滅チェック
-  $deathCnt = 0;  // HPが0以下の仲間の数
-  foreach($members as $member) {
-    if($member->getHitPoint() > 0) {
-      $isFinishFlg = false;
+  // 戦闘終了条件のチェック 仲間全員のHPが0 または、敵全員のHPが0
+  $isFinishFlg = isFinish($members);
+  if ($isFinishFlg) {
+      $message = "GAME OVER ....\n\n";
       break;
-    }
-    $deathCnt++;
-  }
-  if($deathCnt === count($members)) {
-    $isFinishFlg = true;
-    echo 'GAME OVER.....';
-    break;
   }
 
-  // 敵の全滅チェック
-  $deathCnt = 0; // HPが0以下の敵の数
-  foreach ($enemies as $enemy) {
-    if ($enemy->getHitPoint() > 0) {
-        $isFinishFlg = false;
-        break;
-    }
-    $deathCnt++;
-  }
-  if ($deathCnt === count($enemies)) {
-    $isFinishFlg = true;
-    echo "♪♪♪ファンファーレ♪♪♪\n\n";
-    break;
+  $isFinishFlg = isFinish($enemies);
+  if ($isFinishFlg) {
+      $message = "♪♪♪ファンファーレ♪♪♪\n\n";
+      break;
   }
 
   $turn++;
 
 }
 echo "★★★ 戦闘終了 ★★★\n\n";
+
+echo $message;
 // echo $tiida->getName() . "　：　" . $tiida->getHitPoint() . "/" . $tiida::MAX_HITPOINT . "\n";
 // echo $goblin->getName() . "　：　" . $goblin->getHitPoint() . "/" . $goblin::MAX_HITPOINT . "\n\n";
 
-// 現在のHPの表示
-foreach ($members as $member) {
-    echo $member->getName() . "　：　" . $member->getHitPoint() . "/" . $member::MAX_HITPOINT . "\n";
-}
-echo "\n";
-foreach ($enemies as $enemy) {
-    echo $enemy->getName() . "　：　" . $enemy->getHitPoint() . "/" . $enemy::MAX_HITPOINT . "\n";
-}
+
+
+
+ // 仲間の表示
+  $messageObj->displayStatusMessage($members);
+
+  // 敵の表示
+  $messageObj->displayStatusMessage($enemies);
