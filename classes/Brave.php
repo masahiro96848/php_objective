@@ -33,4 +33,14 @@ class Brave extends Human
     }
     return true;
   }
+
+  public function getAttackPoint()
+  {
+      return $this->attackPoint;
+  }
+
+  public function getHitPoint()
+  {
+      return $this->hitPoint;
+  }
 }
